@@ -287,25 +287,33 @@ def main():
 
     min_pixel = None
     max_pixel = [0, 0]
-    bbox_width = bbox_height = None
-    true_max = None
+    largest_component_ar = [[0, 0], [0, 0]]
 
-    for i in range(len(res)):
-        for j in range(len(res[i])):
-            if res[i][j] == largest_key:
-                if not min_pixel:
-                    min_pixel = [i, j]
+    for key in d.keys():
+        for i in range(len(res)):
+            for j in range(len(res[i])):
+                if res[i][j] == key:
+                    if not min_pixel:
+                        min_pixel = [i, j]
 
-                max_pixel[0] = max(max_pixel[0], i)
-                max_pixel[1] = max(max_pixel[1], j)
+                    max_pixel[0] = max(max_pixel[0], i)
+                    max_pixel[1] = max(max_pixel[1], j)
 
-                # bbox_width = max_pixel[1] - min_pixel[1]
-                # bbox_height = max_pixel[0] - min_pixel[0]
-                # aspect_ratio = bbox_width / bbox_height
-                #
-                # if 1.5 <= aspect_ratio <= 5:
-                #     true_max = [max_pixel[1], max_pixel[0]]
+        bbox_width = max_pixel[1] - min_pixel[1]
+        bbox_height = max_pixel[0] - min_pixel[0]
+        aspect_ratio = bbox_width / bbox_height
+    # (470, 225) and (590, 270)
+        if 1.5 <= aspect_ratio <= 5:
+            largest_component_ar[0][0] = max(min_pixel[0], largest_component_ar[0][0])
+            largest_component_ar[0][1] = max(min_pixel[1], largest_component_ar[0][1])
 
+            largest_component_ar[1][0] = max(max_pixel[0], largest_component_ar[1][0])
+            largest_component_ar[1][1] = max(max_pixel[1], largest_component_ar[1][1])
+
+            # largest_component_ar[0] = max(min_pixel, largest_component_ar[0])
+            # largest_component_ar[1] = max(max_pixel, largest_component_ar[1])
+    print(min_pixel, max_pixel)
+    print(largest_component_ar)
 
 
     # with open('./output.txt', 'w') as f:
