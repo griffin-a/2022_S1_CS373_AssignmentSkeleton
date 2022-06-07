@@ -231,7 +231,7 @@ def main():
     SHOW_DEBUG_FIGURES = True
 
     # this is the default input image filename
-    input_filename = "numberplate3.png"
+    input_filename = "numberplate6.png"
 
     if command_line_arguments:
         input_filename = command_line_arguments[0]
@@ -287,9 +287,12 @@ def main():
 
     min_pixel = None
     max_pixel = [0, 0]
-    largest_component_ar = [[0, 0], [0, 0]]
 
-    for key in d.keys():
+    reversed_dict = sorted(d.items(), key=lambda x: x[1], reverse=True)
+    reversed_keys = [x[0] for x in reversed_dict]
+    print(reversed_keys)
+
+    for key in reversed_keys:
         for i in range(len(res)):
             for j in range(len(res[i])):
                 if res[i][j] == key:
@@ -304,16 +307,9 @@ def main():
         aspect_ratio = bbox_width / bbox_height
     # (470, 225) and (590, 270)
         if 1.5 <= aspect_ratio <= 5:
-            largest_component_ar[0][0] = max(min_pixel[0], largest_component_ar[0][0])
-            largest_component_ar[0][1] = max(min_pixel[1], largest_component_ar[0][1])
+            break
 
-            largest_component_ar[1][0] = max(max_pixel[0], largest_component_ar[1][0])
-            largest_component_ar[1][1] = max(max_pixel[1], largest_component_ar[1][1])
-
-            # largest_component_ar[0] = max(min_pixel, largest_component_ar[0])
-            # largest_component_ar[1] = max(max_pixel, largest_component_ar[1])
     print(min_pixel, max_pixel)
-    print(largest_component_ar)
 
 
     # with open('./output.txt', 'w') as f:
