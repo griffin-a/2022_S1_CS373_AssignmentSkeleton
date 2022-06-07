@@ -2,6 +2,8 @@ from matplotlib import pyplot
 
 # import our basic, light-weight png reader library
 import imageIO.png
+import math
+
 
 # this function reads an RGB color png file and returns width, height, as well as pixel arrays for r,g,b
 def readRGBImageToSeparatePixelArrays(input_filename):
@@ -39,29 +41,55 @@ def readRGBImageToSeparatePixelArrays(input_filename):
         pixel_array_g.append(pixel_row_g)
         pixel_array_b.append(pixel_row_b)
 
-    return (image_width, image_height, pixel_array_r, pixel_array_g, pixel_array_b)
+    return image_width, image_height, pixel_array_r, pixel_array_g, pixel_array_b
 
 
 # a useful shortcut method to create a list of lists based array representation for an image, initialized with a value
-def createInitializedGreyscalePixelArray(image_width, image_height, initValue = 0):
-
+def createInitializedGreyscalePixelArray(image_width, image_height, initValue=0):
     new_array = [[initValue for x in range(image_width)] for y in range(image_height)]
     return new_array
 
 
-
+# def computeHistogram(pixel_array, image_width, image_height, nr_bins):
+#     histogram = [0.0 for _ in range(nr_bins)]
+#     bin_size = 255 / nr_bins
+#
+#     # your task to compute the correct histogram!
+#     for row in pixel_array:
+#         for col in row:
+#             histogram[int(col // bin_size)] += 1
+#
+#     # incorrect histogram
+#     # histogram[0] = 10
+#     # histogram[32] = 15
+#     # histogram[63] = 10
+#
+#     return histogram
 def computeHistogram(pixel_array, image_width, image_height, nr_bins):
-
-    histogram = [0.0 for i in range(nr_bins)]
-
-    # your task to compute the correct histogram!
-
-    # incorrect histogram
-    histogram[0] = 10
-    histogram[32] = 15
-    histogram[63] = 10
-
+    global e
+    histogram = [0.0] * nr_bins
+    h_range = math.ceil(255 / nr_bins)
+    for i in range(image_height):
+        for k in range(image_width):
+            e = pixel_array[i][k]
+        result = math.floor(e / h_range)
+        if result >= nr_bins:
+            result -= 1
+        histogram[result] += 1.0
     return histogram
+
+
+def computeThresholdGE(pixel_array, threshold_value, image_width, image_height):
+    res = createInitializedGreyscalePixelArray(image_width, image_height)
+
+    for row in range(len(pixel_array)):
+        for col in range(len(pixel_array[row])):
+            if pixel_array[row][col] < threshold_value:
+                res[row][col] = 0
+            else:
+                res[row][col] = 255
+
+    return res
 
 
 def main():
@@ -83,7 +111,6 @@ def main():
     axs1[1].bar(range(nr_bins), dummy_histogram)
 
     pyplot.show()
-
 
 
 if __name__ == "__main__":
