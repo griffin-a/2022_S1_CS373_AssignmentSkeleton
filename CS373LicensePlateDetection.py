@@ -231,7 +231,7 @@ def main():
     SHOW_DEBUG_FIGURES = True
 
     # this is the default input image filename
-    input_filename = "numberplate2.png"
+    input_filename = "numberplate3.png"
 
     if command_line_arguments:
         input_filename = command_line_arguments[0]
@@ -269,10 +269,10 @@ def main():
     px_array = computeThresholdGE(px_array, 150, image_width, image_height)
 
     # print(px_array)
-    for _ in range(4):
+    for _ in range(3):
         px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
 
-    for _ in range(4):
+    for _ in range(3):
         px_array = computeErosion8Nbh3x3FlatSE(px_array, image_width, image_height)
 
     # (px_array)
@@ -288,8 +288,7 @@ def main():
     largest_key = max(d, key=d.get)
     print(largest_key)
 
-    min_pixel = None
-    max_pixel = [0, 0]
+    min_pixel, max_pixel = None, None
 
     reversed_dict = sorted(d.items(), key=lambda x: x[1], reverse=True)
     reversed_keys = [x[0] for x in reversed_dict]
@@ -298,25 +297,34 @@ def main():
     largest_key_ar = None
 
     for key in reversed_keys:
+        x_list, y_list = [], []
         for i in range(len(res)):
             for j in range(len(res[i])):
                 if res[i][j] == key:
-                    if not min_pixel:
-                        min_pixel = [i, j]
+                    # if not min_pixel:
+                    #     min_pixel = [i, j]
+                    # elif i > max_pixel[0]:
+                    #     max_pixel[0] = i
+                    # elif j > max_pixel[1]:
+                    #     max_pixel[1] = j
+                    # max_pixel[0] = max(max_pixel[0], i)
+                    # max_pixel[1] = max(max_pixel[1], j)
+                    x_list.append(i)
+                    y_list.append(j)
 
-                    max_pixel[0] = max(max_pixel[0], i)
-                    max_pixel[1] = max(max_pixel[1], j)
-
+        min_pixel, max_pixel = [min(x_list), min(y_list)], [max(x_list), max(y_list)]
         bbox_width = max_pixel[1] - min_pixel[1]
         bbox_height = max_pixel[0] - min_pixel[0]
         aspect_ratio = bbox_width / bbox_height
     # (470, 225) and (590, 270)
         if 1.5 <= aspect_ratio <= 5:
+            print("Aspect ratio hit")
             largest_key_ar = key
             break
 
     print("largest key with AR", largest_key_ar)
-    print(min_pixel, max_pixel)
+    print("min pixel", min_pixel)
+    print("max pixel", max_pixel)
 
 
     # with open('./output.txt', 'w') as f:
@@ -344,10 +352,10 @@ def main():
 
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image')
-    axs1[1, 1].imshow(res_largest_component, cmap='gray')
+    axs1[1, 1].imshow(px_array_r, cmap='gray')
     rect = Rectangle((min_pixel[1], min_pixel[0]), max_pixel[1] - min_pixel[1], max_pixel[0] - min_pixel[0], linewidth=1,
                      edgecolor='g', facecolor='none')
-    # axs1[1, 1].add_patch(rect)
+    axs1[1, 1].add_patch(rect)
 
     # write the output image into output_filename, using the matplotlib savefig method
     extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
