@@ -266,13 +266,13 @@ def main():
     # 140 3 3 (2 and 3 are close; 4 only 2/3 match, 1, 5, 6 match)
     # 150 4 4 (4/6) (2 and 3 are somewhat close)
     # 150 3 5, 5x5 dilation (4/6)
-    px_array = computeThresholdGE(px_array, 140, image_width, image_height)
+    px_array = computeThresholdGE(px_array, 150, image_width, image_height)
 
     # print(px_array)
-    for _ in range(3):
+    for _ in range(4):
         px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
 
-    for _ in range(3):
+    for _ in range(4):
         px_array = computeErosion8Nbh3x3FlatSE(px_array, image_width, image_height)
 
     # (px_array)
