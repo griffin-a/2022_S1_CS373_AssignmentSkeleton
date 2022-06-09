@@ -231,7 +231,7 @@ def main():
     SHOW_DEBUG_FIGURES = True
 
     # this is the default input image filename
-    input_filename = "numberplate6.png"
+    input_filename = "numberplate2.png"
 
     if command_line_arguments:
         input_filename = command_line_arguments[0]
@@ -262,14 +262,17 @@ def main():
 
     axs1[0, 1].set_title('Contrast Stretching')
     axs1[0, 1].imshow(px_array, cmap='gray')
-
+    # 140 5 6 (4/6)
+    # 140 3 3 (2 and 3 are close; 4 only 2/3 match, 1, 5, 6 match)
+    # 150 4 4 (4/6) (2 and 3 are somewhat close)
+    # 150 3 5, 5x5 dilation (4/6)
     px_array = computeThresholdGE(px_array, 140, image_width, image_height)
 
     # print(px_array)
-    for _ in range(5):
+    for _ in range(3):
         px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
 
-    for _ in range(6):
+    for _ in range(3):
         px_array = computeErosion8Nbh3x3FlatSE(px_array, image_width, image_height)
 
     # (px_array)
@@ -325,12 +328,22 @@ def main():
     bbox_min_y = center_y - image_width / 4.0
     bbox_max_y = center_y + image_width / 4.0
 
+    # BW image of only the largest connected component
+    res_largest_component = createInitializedGreyscalePixelArray(image_width, image_height)
+
+    for i in range(len(res)):
+        for j in range(len(res[i])):
+            if res[i][j] == largest_key:
+                res_largest_component[i][j] = 1
+
+    print(res_largest_component)
+
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image')
-    axs1[1, 1].imshow(px_array, cmap='gray')
+    axs1[1, 1].imshow(res_largest_component, cmap='gray')
     rect = Rectangle((min_pixel[1], min_pixel[0]), max_pixel[1] - min_pixel[1], max_pixel[0] - min_pixel[0], linewidth=1,
                      edgecolor='g', facecolor='none')
-    axs1[1, 1].add_patch(rect)
+    # axs1[1, 1].add_patch(rect)
 
     # write the output image into output_filename, using the matplotlib savefig method
     extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
