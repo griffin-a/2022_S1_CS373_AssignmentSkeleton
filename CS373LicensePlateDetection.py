@@ -295,6 +295,8 @@ def main():
     reversed_keys = [x[0] for x in reversed_dict]
     print(reversed_keys)
 
+    largest_key_ar = None
+
     for key in reversed_keys:
         for i in range(len(res)):
             for j in range(len(res[i])):
@@ -310,8 +312,10 @@ def main():
         aspect_ratio = bbox_width / bbox_height
     # (470, 225) and (590, 270)
         if 1.5 <= aspect_ratio <= 5:
+            largest_key_ar = key
             break
 
+    print("largest key with AR", largest_key_ar)
     print(min_pixel, max_pixel)
 
 
@@ -333,10 +337,10 @@ def main():
 
     for i in range(len(res)):
         for j in range(len(res[i])):
-            if res[i][j] == largest_key:
+            if res[i][j] == largest_key_ar:
                 res_largest_component[i][j] = 1
 
-    print(res_largest_component)
+    # print(res_largest_component)
 
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image')
