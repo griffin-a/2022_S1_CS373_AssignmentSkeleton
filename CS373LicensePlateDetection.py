@@ -4,9 +4,11 @@ from pathlib import Path
 
 from matplotlib import pyplot
 from matplotlib.patches import Rectangle
+from PIL import Image
 
 # import our basic, light-weight png reader library
 import imageIO.png
+import easyocr
 
 
 class Queue:
@@ -316,7 +318,7 @@ def main():
         bbox_width = max_pixel[1] - min_pixel[1]
         bbox_height = max_pixel[0] - min_pixel[0]
         aspect_ratio = bbox_width / bbox_height
-    # (470, 225) and (590, 270)
+        # (470, 225) and (590, 270)
         if 1.5 <= aspect_ratio <= 5:
             print("Aspect ratio hit")
             largest_key_ar = key
@@ -325,7 +327,6 @@ def main():
     print("largest key with AR", largest_key_ar)
     print("min pixel", min_pixel)
     print("max pixel", max_pixel)
-
 
     # with open('./output.txt', 'w') as f:
     #     for row in res:
@@ -340,20 +341,28 @@ def main():
     bbox_min_y = center_y - image_width / 4.0
     bbox_max_y = center_y + image_width / 4.0
 
-    # BW image of only the largest connected component
-    res_largest_component = createInitializedGreyscalePixelArray(image_width, image_height)
-
-    for i in range(len(res)):
-        for j in range(len(res[i])):
-            if res[i][j] == largest_key_ar:
-                res_largest_component[i][j] = 1
-
+    # Binary `BW image of only the largest connected component: testing purposes only
+    # res_largest_component = createInitializedGreyscalePixelArray(image_width, image_height)
+    #
+    # for i in range(len(res)):
+    #     for j in range(len(res[i])):
+    #         if res[i][j] == largest_key_ar:
+    #             res_largest_component[i][j] = 1
     # print(res_largest_component)
+
+    image = Image.open(input_filename)
+    cropped_image = image.crop((min_pixel[1], min_pixel[0], max_pixel[1], max_pixel[0]))
+    new_name = "{}-cropped.png".format(input_filename.replace(".png", ""))
+    cropped_image.save(new_name)
+    # reader = easyocr.Reader(['en'])
+    # results = reader.readtext(f"./{input_filename}")
+    # print(results)
 
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image')
     axs1[1, 1].imshow(px_array_r, cmap='gray')
-    rect = Rectangle((min_pixel[1], min_pixel[0]), max_pixel[1] - min_pixel[1], max_pixel[0] - min_pixel[0], linewidth=1,
+    rect = Rectangle((min_pixel[1], min_pixel[0]), max_pixel[1] - min_pixel[1], max_pixel[0] - min_pixel[0],
+                     linewidth=1,
                      edgecolor='g', facecolor='none')
     axs1[1, 1].add_patch(rect)
 
