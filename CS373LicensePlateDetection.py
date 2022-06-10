@@ -254,7 +254,7 @@ def main():
 
     # setup the plots for intermediate results in a figure
     fig1, axs1 = pyplot.subplots(3, 2)
-    fig1.tight_layout()
+    # fig1.tight_layout()
 
     axs1[0, 0].set_title('Greyscale')
     axs1[0, 0].imshow(px_array_r, cmap='gray')
@@ -393,6 +393,14 @@ def main():
                          linewidth=1,
                          edgecolor='g', facecolor='none')
         axs1[2, 1].add_patch(rect)
+
+    offset = 10
+
+    for x, obj2 in enumerate(ocr_dict.keys()):
+        match = ocr_dict[obj2]["match"]
+        pyplot.text(0, 70 + (offset * x), f"Detected: \"{obj2}\", Confidence: {match:.2%}")
+
+    fig1.tight_layout()
 
     # write the output image into output_filename, using the matplotlib savefig method
     extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
