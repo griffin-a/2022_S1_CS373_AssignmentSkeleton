@@ -371,16 +371,32 @@ def main():
                      edgecolor='g', facecolor='none')
     axs1[1, 1].add_patch(rect)
 
+    ocr_dict = {}
+
+    # Extract info for each text artifact
+    for obj in results:
+        ocr_dict[obj[1]] = {"coords": obj[0], "match": obj[2]}
+
+    print(ocr_dict)
+
+    # OCR plots
     axs1[2, 0].set_title("Cropped License Plate")
     axs1[2, 0].imshow(cropped_image)
 
     axs1[2, 1].set_title("Identified Words/Numbers")
     axs1[2, 1].imshow(cropped_image)
 
+    # Generate rectangles based on bounding box coords from identified objects
+    for obj in ocr_dict.keys():
+        min_coord, max_coord = ocr_dict[obj]["coords"][0], ocr_dict[obj]["coords"][2]
+        rect = Rectangle((min_coord[0], min_coord[1]), max_coord[0] - min_coord[0], max_coord[1] - min_coord[1],
+                         linewidth=1,
+                         edgecolor='g', facecolor='none')
+        axs1[2, 1].add_patch(rect)
+
     # write the output image into output_filename, using the matplotlib savefig method
     extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
     pyplot.savefig(output_filename, bbox_inches=extent, dpi=600)
-
 
     if SHOW_DEBUG_FIGURES:
         # plot the current figure
