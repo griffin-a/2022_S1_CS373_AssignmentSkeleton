@@ -254,6 +254,8 @@ def main():
 
     # setup the plots for intermediate results in a figure
     fig1, axs1 = pyplot.subplots(3, 2)
+    fig1.tight_layout()
+
     axs1[0, 0].set_title('Greyscale')
     axs1[0, 0].imshow(px_array_r, cmap='gray')
 
@@ -350,11 +352,13 @@ def main():
     #             res_largest_component[i][j] = 1
     # print(res_largest_component)
 
+    # Crop image
     image = Image.open(input_filename)
     cropped_image = image.crop((min_pixel[1], min_pixel[0], max_pixel[1], max_pixel[0]))
     new_name = "{}-cropped.png".format(input_filename.replace(".png", ""))
     cropped_image.save(new_name)
 
+    # Run OCR
     reader = easyocr.Reader(['en'])
     results = reader.readtext(new_name)
     print(results)
@@ -369,12 +373,14 @@ def main():
 
     axs1[2, 0].set_title("Cropped License Plate")
     axs1[2, 0].imshow(cropped_image)
-    axs1[2, 1].set_title("Deez nutz")
-    axs1[2, 1].imshow(px_array_r, cmap='gray')
+
+    axs1[2, 1].set_title("Identified Words/Numbers")
+    axs1[2, 1].imshow(cropped_image)
 
     # write the output image into output_filename, using the matplotlib savefig method
     extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
     pyplot.savefig(output_filename, bbox_inches=extent, dpi=600)
+
 
     if SHOW_DEBUG_FIGURES:
         # plot the current figure
