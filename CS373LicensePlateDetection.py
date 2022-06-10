@@ -233,7 +233,7 @@ def main():
     SHOW_DEBUG_FIGURES = True
 
     # this is the default input image filename
-    input_filename = "numberplate1.png"
+    input_filename = "numberplate3.png"
 
     if command_line_arguments:
         input_filename = command_line_arguments[0]
@@ -404,7 +404,9 @@ def main():
 
     for x, obj2 in enumerate(ocr_dict.keys()):
         match = ocr_dict[obj2]["match"]
-        pyplot.text(0, 70 + (offset * x), f"Detected: \"{obj2}\", Confidence: {match:.2%}")
+        # axs2[1].text(0.5, 0.01, f"Detected: \"{obj2}\", Confidence: {match:.2%}")
+        axs2[1].annotate(f"Detected: \"{obj2}\", Confidence: {match:.2%}", (0, 0), (0, -40 - (offset * x)), xycoords='axes fraction',
+                         textcoords='offset points', va='top')
 
     fig2.tight_layout()
 
