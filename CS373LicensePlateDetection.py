@@ -233,7 +233,7 @@ def main():
     SHOW_DEBUG_FIGURES = True
 
     # this is the default input image filename
-    input_filename = "numberplate3.png"
+    input_filename = "numberplate1.png"
 
     if command_line_arguments:
         input_filename = command_line_arguments[0]
@@ -253,8 +253,8 @@ def main():
     (image_width, image_height, px_array_r, px_array_g, px_array_b) = readRGBImageToSeparatePixelArrays(input_filename)
 
     # setup the plots for intermediate results in a figure
-    fig1, axs1 = pyplot.subplots(3, 2)
-    # fig1.tight_layout()
+    fig1, axs1 = pyplot.subplots(2, 2)
+    fig1.tight_layout()
 
     axs1[0, 0].set_title('Greyscale')
     axs1[0, 0].imshow(px_array_r, cmap='gray')
@@ -371,6 +371,12 @@ def main():
                      edgecolor='g', facecolor='none')
     axs1[1, 1].add_patch(rect)
 
+    # write the output image into output_filename, using the matplotlib savefig method
+    extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
+    pyplot.savefig(output_filename, bbox_inches=extent, dpi=600)
+
+    fig2, axs2 = pyplot.subplots(1, 2)
+
     ocr_dict = {}
 
     # Extract info for each text artifact
@@ -380,11 +386,11 @@ def main():
     print(ocr_dict)
 
     # OCR plots
-    axs1[2, 0].set_title("Cropped License Plate")
-    axs1[2, 0].imshow(cropped_image)
+    axs2[0].set_title("Cropped License Plate")
+    axs2[0].imshow(cropped_image)
 
-    axs1[2, 1].set_title("Identified Words/Numbers")
-    axs1[2, 1].imshow(cropped_image)
+    axs2[1].set_title("Identified Words/Numbers")
+    axs2[1].imshow(cropped_image)
 
     # Generate rectangles based on bounding box coords from identified objects
     for obj in ocr_dict.keys():
@@ -392,7 +398,7 @@ def main():
         rect = Rectangle((min_coord[0], min_coord[1]), max_coord[0] - min_coord[0], max_coord[1] - min_coord[1],
                          linewidth=1,
                          edgecolor='g', facecolor='none')
-        axs1[2, 1].add_patch(rect)
+        axs2[1].add_patch(rect)
 
     offset = 10
 
@@ -400,11 +406,7 @@ def main():
         match = ocr_dict[obj2]["match"]
         pyplot.text(0, 70 + (offset * x), f"Detected: \"{obj2}\", Confidence: {match:.2%}")
 
-    fig1.tight_layout()
-
-    # write the output image into output_filename, using the matplotlib savefig method
-    extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
-    pyplot.savefig(output_filename, bbox_inches=extent, dpi=600)
+    fig2.tight_layout()
 
     if SHOW_DEBUG_FIGURES:
         # plot the current figure
