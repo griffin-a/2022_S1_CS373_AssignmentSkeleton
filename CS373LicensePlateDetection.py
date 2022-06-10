@@ -228,12 +228,14 @@ def computeConnectedComponentLabeling(pixel_array, image_width, image_height):
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
 # we won't detect arbitrary or difficult to detect license plates!
 def main():
+    print("***NOTICE: The first time running the program on your computer may take longer than usual due to "
+          "downloading of easyOCR model. Also, note that the there are two windows that will open during execution***")
     command_line_arguments = sys.argv[1:]
 
     SHOW_DEBUG_FIGURES = True
 
     # this is the default input image filename
-    input_filename = "numberplate3.png"
+    input_filename = "numberplate6.png"
 
     if command_line_arguments:
         input_filename = command_line_arguments[0]
@@ -286,17 +288,14 @@ def main():
     axs1[1, 0].imshow(px_array, cmap='gray')
 
     res, d = computeConnectedComponentLabeling(px_array, image_width, image_height)
-    print(d)
 
     # Find the largest connected component
     largest_key = max(d, key=d.get)
-    print(largest_key)
 
     min_pixel, max_pixel = None, None
 
     reversed_dict = sorted(d.items(), key=lambda x: x[1], reverse=True)
     reversed_keys = [x[0] for x in reversed_dict]
-    print(reversed_keys)
 
     largest_key_ar = None
 
@@ -305,14 +304,6 @@ def main():
         for i in range(len(res)):
             for j in range(len(res[i])):
                 if res[i][j] == key:
-                    # if not min_pixel:
-                    #     min_pixel = [i, j]
-                    # elif i > max_pixel[0]:
-                    #     max_pixel[0] = i
-                    # elif j > max_pixel[1]:
-                    #     max_pixel[1] = j
-                    # max_pixel[0] = max(max_pixel[0], i)
-                    # max_pixel[1] = max(max_pixel[1], j)
                     x_list.append(i)
                     y_list.append(j)
 
@@ -320,37 +311,18 @@ def main():
         bbox_width = max_pixel[1] - min_pixel[1]
         bbox_height = max_pixel[0] - min_pixel[0]
         aspect_ratio = bbox_width / bbox_height
-        # (470, 225) and (590, 270)
+
         if 1.5 <= aspect_ratio <= 5:
-            print("Aspect ratio hit")
             largest_key_ar = key
             break
 
-    print("largest key with AR", largest_key_ar)
-    print("min pixel", min_pixel)
-    print("max pixel", max_pixel)
+    # print("largest key with AR", largest_key_ar)
+    # print("min pixel", min_pixel)
+    # print("max pixel", max_pixel)
 
     # with open('./output.txt', 'w') as f:
     #     for row in res:
     #         f.write(str(row))
-
-    # compute a dummy bounding box centered in the middle of the input image, and with a size of half of width and
-    # height
-    center_x = image_width / 2.0
-    center_y = image_height / 2.0
-    bbox_min_x = center_x - image_width / 4.0
-    bbox_max_x = center_x + image_width / 4.0
-    bbox_min_y = center_y - image_width / 4.0
-    bbox_max_y = center_y + image_width / 4.0
-
-    # Binary `BW image of only the largest connected component: testing purposes only
-    # res_largest_component = createInitializedGreyscalePixelArray(image_width, image_height)
-    #
-    # for i in range(len(res)):
-    #     for j in range(len(res[i])):
-    #         if res[i][j] == largest_key_ar:
-    #             res_largest_component[i][j] = 1
-    # print(res_largest_component)
 
     # Crop image
     image = Image.open(input_filename)
@@ -358,10 +330,9 @@ def main():
     new_name = "{}-cropped.png".format(input_filename.replace(".png", ""))
     cropped_image.save(new_name)
 
-    # Run OCR
+    # Run OCR: detect text from image using easyOCR
     reader = easyocr.Reader(['en'])
     results = reader.readtext(new_name)
-    print(results)
 
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image')
@@ -402,6 +373,7 @@ def main():
 
     offset = 10
 
+    # Display info regarding the percentage confidence of the guessed text and the guessed text
     for x, obj2 in enumerate(ocr_dict.keys()):
         match = ocr_dict[obj2]["match"]
         # axs2[1].text(0.5, 0.01, f"Detected: \"{obj2}\", Confidence: {match:.2%}")
