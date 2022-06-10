@@ -253,7 +253,7 @@ def main():
     (image_width, image_height, px_array_r, px_array_g, px_array_b) = readRGBImageToSeparatePixelArrays(input_filename)
 
     # setup the plots for intermediate results in a figure
-    fig1, axs1 = pyplot.subplots(2, 2)
+    fig1, axs1 = pyplot.subplots(3, 2)
     axs1[0, 0].set_title('Greyscale')
     axs1[0, 0].imshow(px_array_r, cmap='gray')
 
@@ -354,9 +354,10 @@ def main():
     cropped_image = image.crop((min_pixel[1], min_pixel[0], max_pixel[1], max_pixel[0]))
     new_name = "{}-cropped.png".format(input_filename.replace(".png", ""))
     cropped_image.save(new_name)
-    # reader = easyocr.Reader(['en'])
-    # results = reader.readtext(f"./{input_filename}")
-    # print(results)
+
+    reader = easyocr.Reader(['en'])
+    results = reader.readtext(new_name)
+    print(results)
 
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image')
@@ -365,6 +366,11 @@ def main():
                      linewidth=1,
                      edgecolor='g', facecolor='none')
     axs1[1, 1].add_patch(rect)
+
+    axs1[2, 0].set_title("Cropped License Plate")
+    axs1[2, 0].imshow(cropped_image)
+    axs1[2, 1].set_title("Deez nutz")
+    axs1[2, 1].imshow(px_array_r, cmap='gray')
 
     # write the output image into output_filename, using the matplotlib savefig method
     extent = axs1[1, 1].get_window_extent().transformed(fig1.dpi_scale_trans.inverted())
